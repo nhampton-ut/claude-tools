@@ -43,9 +43,17 @@ else
 fi
 
 # Step 2: uv / uvx
+UV_FRESHLY_INSTALLED=false
 if ! command -v uvx &>/dev/null && [ ! -f "$HOME/.local/bin/uvx" ]; then
   echo "Installing uv..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
+  UV_FRESHLY_INSTALLED=true
+fi
+
+# Source uv env so uvx is available in this session if just installed
+if [ -f "$HOME/.local/bin/env" ]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.local/bin/env"
 fi
 
 UVX_PATH="${HOME}/.local/bin/uvx"
@@ -75,3 +83,10 @@ echo ""
 echo "Done! Verify setup:"
 echo "  Qdrant dashboard: http://localhost:6333/dashboard"
 echo "  MCP server:       run /mcp in Claude Code"
+
+if [ "$UV_FRESHLY_INSTALLED" = true ]; then
+  echo ""
+  echo "Note: uv was just installed. To use 'uvx' in your current shell, run:"
+  echo "  source \$HOME/.local/bin/env"
+  echo "  (or open a new terminal — your shell profile has been updated automatically)"
+fi
